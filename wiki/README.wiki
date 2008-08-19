@@ -1,0 +1,1 @@
+The code includes code copied from http://www.codeproject.com/KB/cs/WAVE_Processor_In_C_.aspx
