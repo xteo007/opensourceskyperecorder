@@ -3,6 +3,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using System.Diagnostics;
+using WaveLib;
+using Yeti.MMedia.Mp3;
 
 namespace PublicDomain
 {
@@ -12,6 +14,7 @@ namespace PublicDomain
         static string tempFileSpeaker;
         static string tempFileMic;
         static string outputFile;
+        static string outputMp3File;
 
 		static void Main(string[] args)
 		{
@@ -65,7 +68,14 @@ Commands:
                             if (File.Exists(outputFile))
                             {
                                 Console.WriteLine("Launching in default media player...");
-                                Process.Start(outputFile);
+                                if (!string.IsNullOrEmpty(outputMp3File))
+                                {
+                                    Process.Start(outputMp3File);
+                                }
+                                else
+                                {
+                                    Process.Start(outputFile);
+                                }
                             }
                             else
                             {
@@ -74,7 +84,13 @@ Commands:
                             break;
                         case "mp3":
                             // http://www.codeproject.com/KB/audio-video/MP3Compressor.aspx
-                            Console.WriteLine("Not implemented yet");
+                            if (File.Exists(outputFile))
+                            {
+                                Console.Write("Path to new MP3 file: ");
+                                outputMp3File = Console.ReadLine();
+                                ConvertToMp3(outputFile, outputMp3File);
+                                Console.WriteLine("Finished writing MP3 file");
+                            }
                             break;
                         default:
                             go = false;
@@ -88,6 +104,23 @@ Commands:
                 File.Delete(tempFileMic);
             }
 		}
+
+        private static void ConvertToMp3(string outputFile, string mp3file)
+        {
+            using (WaveStream wavStream = new WaveStream(outputFile))
+            {
+                using (Mp3Writer writer = new Mp3Writer(new FileStream(mp3file,
+                                                    FileMode.Create), wavStream.Format))
+                {
+                    byte[] buff = new byte[writer.OptimalBufferSize];
+                    int read = 0;
+                    while ((read = wavStream.Read(buff, 0, buff.Length)) > 0)
+                    {
+                        writer.Write(buff, 0, read);
+                    }
+                }
+            }
+        }
 
 		private static void CallBack(SkypeRecorder skypeRecorder)
 		{
