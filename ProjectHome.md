@@ -1,0 +1,1 @@
+This simple command line program is a C# .NET Skype plugin which hooks into Skype to record the audio of a call and write it to a WAV file. It handles both lines of the call (i.e. the resulting WAV file has both what's coming from the speaker(s) as well as what the user says through the microphone and they are interweaved).
